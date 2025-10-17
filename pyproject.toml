@@ -1,0 +1,12 @@
+[project]
+name = "handtrackingproject"
+version = "0.1.0"
+description = "Add your description here"
+requires-python = ">=3.11"
+dependencies = [
+    "matplotlib>=3.10.7",
+    "mediapipe>=0.10.21",
+    "opencv-python>=4.11.0.86",
+    "pip>=25.2",
+    "scikit-learn>=1.7.2",
+]

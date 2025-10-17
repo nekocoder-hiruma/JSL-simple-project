@@ -67,9 +67,7 @@ Step 1: Collect Image Data
 
 This step launches your webcam and guides you through collecting 100 images for each of the 20 gestures.
 
-Run the _collection script:
-
-`python main.py collect`
+Run the collection script: `python main.py collect`
 
 A window will appear showing your webcam feed.
 
@@ -81,7 +79,7 @@ Press the 'S' key to begin capturing 100 images for that sign.
 
 The system will automatically proceed to the next class (class 1 ('い')) and wait for you to press 'S' again.
 
-Repeat this_ process for all 20 characters. The collected images will be saved in the data/ directory.
+Repeat this process for all 20 characters. The collected images will be saved in the data/ directory.
 
 Step 2: Create the Dataset
 
@@ -99,9 +97,7 @@ Step 4: Run Real-Time Inference
 
 You're all set! This final step runs the real-time gesture recognition.
 
-Run the inference script:
-
-`python main.py inference`
+Run the inference script: `python main.py inference`
 
 A window will appear with your webcam feed.
 

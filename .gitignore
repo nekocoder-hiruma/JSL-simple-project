@@ -105,6 +105,10 @@ Network Trash Folder
 Temporary Items
 .apdisk
 
+.idea/
+__pycache__/
+.python-version
+
 data/
 data.pickle
 model.p

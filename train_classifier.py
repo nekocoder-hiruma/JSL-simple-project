@@ -3,55 +3,100 @@ import numpy as np
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
+from typing import Tuple, Optional, Dict, Any, List
 from constants import DATASET_PATH, MODEL_PATH
 
-
-def train_model() -> None:
+def load_dataset(filepath: str) -> Optional[Tuple[np.ndarray, np.ndarray]]:
     """
-    Loads the processed dataset, trains a RandomForestClassifier,
-    evaluates its accuracy, and saves the trained model.
+    Loads the dataset from a pickle file.
+
+    Args:
+        filepath (str): Path to the data.pickle file.
+
+    Returns:
+        Optional[Tuple[np.ndarray, np.ndarray]]: A tuple of (data, labels)
+                                                or None if the file is not found.
     """
     try:
-        # 'rb' means 'read binary' mode
-        with open(DATASET_PATH, "rb") as f:
+        with open(filepath, "rb") as f:
             data_dict = pickle.load(f)
+        data = np.asarray(data_dict["data"])
+        labels = np.asarray(data_dict["labels"])
+        return data, labels
     except FileNotFoundError:
-        print(f"Error: '{DATASET_PATH}' not found. Please create the dataset first.")
-        return
+        print(f"Error: '{filepath}' not found. Please create the dataset first.")
+        return None
 
-    # Convert the data and labels lists into NumPy arrays for scikit-learn
-    data = np.asarray(data_dict["data"])
-    labels = np.asarray(data_dict["labels"])
+def prepare_data(data: np.ndarray, labels: np.ndarray) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+    """
+    Splits the dataset into training and testing sets.
 
-    # Split the dataset into training and testing sets.
-    # - test_size=0.2: 20% of the data will be used for testing, 80% for training.
-    # - shuffle=True: Randomizes the order of the data before splitting.
-    # - stratify=labels: Ensures that the train and test sets have the
-    #   same proportion of examples from each class as the original dataset.
-    x_train, x_test, y_train, y_test = train_test_split(
+    Args:
+        data (np.ndarray): The full feature dataset.
+        labels (np.ndarray): The full labels dataset.
+
+    Returns:
+        Tuple: (x_train, x_test, y_train, y_test)
+    """
+    return train_test_split(
         data, labels, test_size=0.2, shuffle=True, stratify=labels
     )
 
-    # Initialize the RandomForestClassifier.
-    # This is a good, general-purpose model for this kind of tabular data.
-    model = RandomForestClassifier()
+def train_classifier(x_train: np.ndarray, y_train: np.ndarray) -> RandomForestClassifier:
+    """
+    Initializes and trains a RandomForestClassifier.
 
+    Args:
+        x_train (np.ndarray): Training features.
+        y_train (np.ndarray): Training labels.
+
+    Returns:
+        RandomForestClassifier: The trained model.
+    """
     print("Training model...")
-    # Train the model using the training data
+    model = RandomForestClassifier()
     model.fit(x_train, y_train)
+    return model
 
-    # Use the trained model to make predictions on the *test* data
+def evaluate_model(model: RandomForestClassifier, x_test: np.ndarray, y_test: np.ndarray) -> None:
+    """
+    Evaluates the model on the test set and prints the accuracy.
+
+    Args:
+        model (RandomForestClassifier): The trained model.
+        x_test (np.ndarray): Test features.
+        y_test (np.ndarray): Test labels.
+    """
     y_predict = model.predict(x_test)
-
-    # Compare the model's predictions (y_predict) with the true labels (y_test)
     score = accuracy_score(y_predict, y_test)
-
-    # Print the accuracy as a percentage
     print(f"Accuracy: {score * 100:.2f}%")
 
-    print(f"Saving model to {MODEL_PATH}...")
-    # Save the trained model to a pickle file for use in inference.py
-    with open(MODEL_PATH, "wb") as f:
-        pickle.dump({"model": model}, f)
+def save_model(model: RandomForestClassifier, filepath: str) -> None:
+    """
+    Saves the trained model to a pickle file.
 
-    print("Model saved successfully!")
+    Args:
+        model (RandomForestClassifier): The trained model.
+        filepath (str): The path to save the model.
+    """
+    print(f"Saving model to {filepath}...")
+    try:
+        with open(filepath, "wb") as f:
+            pickle.dump({"model": model}, f)
+        print("Model saved successfully!")
+    except IOError as e:
+        print(f"Error saving model to {filepath}: {e}")
+
+def train_model() -> None:
+    """
+    Main orchestrator function for the training pipeline.
+    """
+    dataset = load_dataset(DATASET_PATH)
+    if dataset is None:
+        return
+
+    data, labels = dataset
+    x_train, x_test, y_train, y_test = prepare_data(data, labels)
+    model = train_classifier(x_train, y_train)
+    evaluate_model(model, x_test, y_test)
+    save_model(model, MODEL_PATH)

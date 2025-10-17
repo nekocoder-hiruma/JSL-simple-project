@@ -6,13 +6,16 @@ DATA_DIR = "./data"
 # DATASET_PATH is the filename for the processed dataset (landmarks and labels).
 DATASET_PATH = "data.pickle"
 # MODEL_PATH is the filename for the trained machine learning model.
-MODEL_PATH = "model.p"
+OLD_MODEL_PATH = "model.p"
+MODEL_PATH = "jsl_model.keras" # Keras model uses .h5 or .keras
+
+# --- New constants for sequence modeling ---
+# SEQUENCE_LENGTH is the number of frames to capture for one sign.
+SEQUENCE_LENGTH = 30
 
 # --- Model and Dataset Config ---
-# NUMBER_OF_CLASSES defines how many different gestures we want to train (あ to と is 20).
-NUMBER_OF_CLASSES = 20
 # DATASET_SIZE_PER_CLASS defines how many images to capture for each gesture.
-DATASET_SIZE_PER_CLASS = 100
+DATASET_SIZE_PER_CLASS = 20
 
 """
 --- Japanese Sign Language Labels (あ to と) ---
@@ -24,8 +27,14 @@ LABELS_DICT = {
     0: 'あ', 1: 'い', 2: 'う', 3: 'え', 4: 'お',
     5: 'か', 6: 'き', 7: 'く', 8: 'け', 9: 'こ',
     10: 'さ', 11: 'し', 12: 'す', 13: 'せ', 14: 'そ',
-    15: 'た', 16: 'ち', 17: 'つ', 18: 'て', 19: 'と'
+    15: 'た', 16: 'ち', 17: 'つ', 18: 'て', 19: 'と',
+    20: 'な', 21: 'に', 22: 'ぬ', 23: 'ね', 24: 'の',
+    25: 'は', 26: 'ひ', 27: 'ふ', 28: 'へ', 29: 'ほ',
+    30: 'ま', 31: 'み', 32: 'む', 33: 'め', 34: 'も'
 }
+
+# NUMBER_OF_CLASSES defines how many different gestures we want to train (あ to と is 20).
+NUMBER_OF_CLASSES = len(LABELS_DICT)
 
 # --- MediaPipe Setup ---
 # Import the specific MediaPipe solutions we need.

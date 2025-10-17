@@ -1,8 +1,7 @@
 import argparse
-from collect_image import collect_images
-from create_dataset import create_dataset
-from train_classifier import train_model
-from inference_classifier import run_inference
+from collect_sequences import collect_sequences
+from model_trainer import main_trainer
+from inference import run_inference
 
 
 def main():
@@ -46,16 +45,12 @@ def main():
 
     # --- Route the action to the correct function ---
     if action == 'collect':
-        print("Starting image collection...")
-        collect_images()
-
-    elif action == 'dataset':
-        print("Creating dataset from images...")
-        create_dataset()
+        print("Starting sequence collection and compiling...")
+        collect_sequences()
 
     elif action == 'train':
         print("Training the model...")
-        train_model()
+        main_trainer()
 
     elif action == 'inference':
         print("Running inference... (Press 'q' to quit)")

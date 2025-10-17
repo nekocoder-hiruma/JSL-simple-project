@@ -132,3 +132,9 @@ _____________
 **Camera Index**: The scripts default to using camera index 0. If you have multiple cameras, you may need to change cv2.VideoCapture(0) to cv2.VideoCapture(1) (or higher) in data_collection.py and inference.py.
 
 **Font Dependency**: To display Japanese characters correctly, the inference.py script attempts to locate system fonts. Ensure you have standard Japanese fonts installed on your Windows or macOS system. If no font is found, it will fall back to displaying the class number (0-19).
+
+
+## Credits
+_______
+
+This project draws inspiration and foundational knowledge from the excellent tutorials by Computer vision engineer: https://www.youtube.com/watch?v=MJCSjXepaAM

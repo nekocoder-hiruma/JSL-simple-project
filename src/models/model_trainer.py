@@ -1,5 +1,5 @@
 import pickle
-from typing import Tuple, Optional, Any
+from typing import Tuple, Optional
 
 import numpy as np
 from sklearn.model_selection import train_test_split
@@ -7,7 +7,7 @@ from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import LSTM, Dense, Dropout
 from tensorflow.keras.utils import to_categorical
 
-from constants import DATASET_PATH, MODEL_PATH, NUMBER_OF_CLASSES, SEQUENCE_LENGTH
+from config_loader import DATASET_PATH, MODEL_PATH, NUMBER_OF_CLASSES, SEQUENCE_LENGTH
 
 
 def load_dataset(filepath: str) -> Optional[Tuple[np.ndarray, np.ndarray]]:
@@ -56,7 +56,7 @@ def build_lstm_model() -> Sequential:
     """
     model = Sequential([
         # *** FIX 1: Imports for these layers are now added ***
-        # The input_shape is (timesteps, features)
+        # The input_shape is (timesteps, utils)
         LSTM(64, return_sequences=True, input_shape=(SEQUENCE_LENGTH, 42)),
         Dropout(0.2),  # Dropout helps prevent overfitting
         LSTM(64, return_sequences=False),  # The last LSTM layer doesn't return a sequence

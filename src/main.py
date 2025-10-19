@@ -1,7 +1,7 @@
 import argparse
-from collect_sequences import collect_sequences
-from model_trainer import main_trainer
-from inference import run_inference
+from collection.collect_sequences import collect_sequences
+from models.model_trainer import main_trainer
+from app.inference import run_inference
 
 
 def main():
@@ -13,7 +13,6 @@ def main():
 
     Examples:
     - python main.py collect
-    - python main.py dataset
     - python main.py train
     - python main.py inference
     """
@@ -27,11 +26,10 @@ def main():
     # 'choices' restricts the user input to only these strings.
     parser.add_argument(
         'action',
-        choices=['collect', 'dataset', 'train', 'inference'],
+        choices=['collect', 'train', 'inference'],
         help="""
         Action to perform:
         'collect': Start collecting images for the dataset.
-        'dataset': Create the dataset from collected images.
         'train': Train the classifier model.
         'inference': Run real-time gesture inference.
         """

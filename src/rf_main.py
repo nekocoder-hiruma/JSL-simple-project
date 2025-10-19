@@ -1,8 +1,8 @@
 import argparse
-from collect_image import collect_images
-from create_dataset import create_dataset
-from train_classifier import train_model
-from inference_classifier import run_inference
+from src.collection.collect_image import collect_images
+from src.data.create_dataset import create_dataset
+from src.models.train_classifier import train_model
+from src.app.inference_classifier import run_inference
 
 
 def main():
@@ -13,10 +13,10 @@ def main():
     You can run this script with different "actions" or "commands".
 
     Examples:
-    - python main.py collect
-    - python main.py dataset
-    - python main.py train
-    - python main.py inference
+    - python rf_main.py collect
+    - python rf_main.py dataset
+    - python rf_main.py train
+    - python rf_main.py inference
     """
 
     # Initialize the argument parser

@@ -4,21 +4,21 @@ from typing import Optional, List, Any, Dict, Tuple
 import cv2
 import numpy as np
 import tensorflow as tf
-from PIL import ImageFont, Image, ImageDraw
+from PIL import ImageFont
 
-from constants import (
+from config_loader import (
     MODEL_PATH,
     LABELS_DICT,
     SEQUENCE_LENGTH,
-    hands_video,
+    hands_video,  # Note: hands_video is now used instead of hands
     mp_drawing,
     mp_hands,
-    mp_drawing_styles
+    mp_drawing_styles, CAMERA_INDEX, CONFIDENCE_THRESHOLD, HIGH_CONFIDENCE_THRESHOLD
 )
+# Import shared functions from the new helpers file
+from utils.helpers import find_font_path, draw_text
 
-# --- Constants for drawing and prediction ---
-HIGH_CONFIDENCE_THRESHOLD = 0.95  # Threshold to "lock in" a prediction
-CONFIDENCE_THRESHOLD = 0.8  # Threshold to display a prediction
+# --- Constants for drawing ---
 BOX_WIDTH = 200
 BOX_HEIGHT = 50
 TEXT_PADDING = 10
@@ -41,7 +41,7 @@ def load_keras_model(filepath: str) -> Optional[tf.keras.Model]:
 
 def initialize_resources() -> Optional[Dict[str, Any]]:
     """Initializes webcam, font, and the sequence buffer."""
-    cap = cv2.VideoCapture(1)
+    cap = cv2.VideoCapture(CAMERA_INDEX)
     if not cap.isOpened():
         print("Error: Could not open video stream.")
         return None
@@ -56,24 +56,11 @@ def initialize_resources() -> Optional[Dict[str, Any]]:
     }
 
 
-def find_font_path() -> Optional[str]:
-    """Attempts to find a suitable font file on Windows or macOS."""
-    font_paths = [
-        "C:/Windows/Fonts/YuGothM.ttc",  # Windows
-        "/System/Library/Fonts/ヒラギノ角ゴシック W3.ttc"  # macOS
-    ]
-    for path in font_paths:
-        try:
-            ImageFont.truetype(path, 32)
-            return path
-        except IOError:
-            continue
-    print("Warning: No suitable Japanese font found. Falling back to default.")
-    return None
-
-
-def process_frame_for_sequence(frame: np.ndarray) -> Tuple[Optional[List[float]], Optional[Any]]:
-    """Processes a single frame to extract and normalize hand landmarks."""
+def process_and_draw_landmarks(frame: np.ndarray) -> Tuple[Optional[List[float]], Optional[Any]]:
+    """
+    Processes a frame to get landmarks and also draws them on the frame.
+    This is different from helpers.process_frame, which only returns data.
+    """
     img_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
     results = hands_video.process(img_rgb)
 
@@ -87,6 +74,7 @@ def process_frame_for_sequence(frame: np.ndarray) -> Tuple[Optional[List[float]]
         mp_drawing_styles.get_default_hand_connections_style()
     )
 
+    # Normalize landmarks for prediction
     x_coords = [lm.x for lm in hand_landmarks.landmark]
     y_coords = [lm.y for lm in hand_landmarks.landmark]
     base_x, base_y = min(x_coords), min(y_coords)
@@ -120,14 +108,13 @@ def draw_prediction_on_frame(frame: np.ndarray, hand_landmarks: Any, predicted_c
     bg_tl = (x1, y1 - BOX_HEIGHT - 20)
     bg_br = (x1 + BOX_WIDTH, y1 - 20)
 
-    if font:
-        img_pil = Image.fromarray(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB))
-        draw = ImageDraw.Draw(img_pil)
-        draw.rectangle([bg_tl, bg_br], fill="white")
-        text_y = bg_tl[1] + (BOX_HEIGHT - 32) // 2
-        text_pos = (bg_tl[0] + TEXT_PADDING, text_y)
-        draw.text(text_pos, predicted_char, font=font, fill=(0, 0, 0, 255))
-        frame[:] = cv2.cvtColor(np.array(img_pil), cv2.COLOR_RGB2BGR)
+    # Draw the white background for the text
+    cv2.rectangle(frame, bg_tl, bg_br, (255, 255, 255), cv2.FILLED)
+
+    # Use the shared helper function to draw the text
+    text_y = bg_tl[1] + (BOX_HEIGHT - 32) // 2
+    text_pos = (bg_tl[0] + TEXT_PADDING, text_y)
+    draw_text(frame, predicted_char, text_pos, font, (0, 0, 0))  # Black text
 
 
 def run_inference() -> None:
@@ -141,34 +128,25 @@ def run_inference() -> None:
 
     cap, font, sequence_buffer = resources["cap"], resources["font"], resources["sequence_buffer"]
     latest_prediction = ""
-
-    # --- Optimization: Adaptive Prediction Rate ---
     prediction_counter = 0
-    prediction_interval = 1  # Predict every frame initially
+    prediction_interval = 1
 
     while True:
         ret, frame = cap.read()
         if not ret: break
 
-        landmarks, hand_landmarks_obj = process_frame_for_sequence(frame)
+        landmarks, hand_landmarks_obj = process_and_draw_landmarks(frame)
         sequence_buffer.append(landmarks or ([0.0] * 42))
 
-        # Only predict if the buffer is full AND the interval counter is zero
         if len(sequence_buffer) == SEQUENCE_LENGTH and prediction_counter == 0:
             predicted_char, confidence = make_sequence_prediction(model, np.array(sequence_buffer))
 
             if predicted_char:
                 latest_prediction = predicted_char
-                # If very confident, predict less frequently.
-                if confidence > HIGH_CONFIDENCE_THRESHOLD:
-                    prediction_interval = 10  # Predict every 10 frames
-                else:
-                    prediction_interval = 1  # Predict every frame
+                prediction_interval = 10 if confidence > HIGH_CONFIDENCE_THRESHOLD else 1
             else:
-                # If confidence drops or no hand, become responsive again
                 prediction_interval = 1
 
-        # Reset counter based on the interval
         prediction_counter = (prediction_counter + 1) % prediction_interval
 
         if latest_prediction and hand_landmarks_obj:

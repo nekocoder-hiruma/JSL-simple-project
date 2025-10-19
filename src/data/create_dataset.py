@@ -4,7 +4,7 @@ from typing import List, Optional
 
 import cv2
 
-from constants import DATA_DIR, DATASET_PATH, hands
+from src.config_loader import DATA_DIR, DATASET_PATH, hands
 
 
 def process_image(image_path: str) -> Optional[List[float]]:

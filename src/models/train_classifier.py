@@ -1,10 +1,13 @@
 import pickle
+from typing import Tuple, Optional
+
 import numpy as np
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
-from typing import Tuple, Optional, Dict, Any, List
-from constants import DATASET_PATH, MODEL_PATH
+from sklearn.model_selection import train_test_split
+
+from src.config_loader import DATASET_PATH, MODEL_PATH
+
 
 def load_dataset(filepath: str) -> Optional[Tuple[np.ndarray, np.ndarray]]:
     """
@@ -47,7 +50,7 @@ def train_classifier(x_train: np.ndarray, y_train: np.ndarray) -> RandomForestCl
     Initializes and trains a RandomForestClassifier.
 
     Args:
-        x_train (np.ndarray): Training features.
+        x_train (np.ndarray): Training utils.
         y_train (np.ndarray): Training labels.
 
     Returns:
@@ -64,7 +67,7 @@ def evaluate_model(model: RandomForestClassifier, x_test: np.ndarray, y_test: np
 
     Args:
         model (RandomForestClassifier): The trained model.
-        x_test (np.ndarray): Test features.
+        x_test (np.ndarray): Test utils.
         y_test (np.ndarray): Test labels.
     """
     y_predict = model.predict(x_test)

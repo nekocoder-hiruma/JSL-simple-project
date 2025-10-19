@@ -1,6 +1,6 @@
 import os
 import cv2
-from constants import DATA_DIR, NUMBER_OF_CLASSES, DATASET_SIZE_PER_CLASS, LABELS_DICT
+from src.config_loader import DATA_DIR, NUMBER_OF_CLASSES, DATASET_SIZE_PER_CLASS, LABELS_DICT
 
 
 def collect_images() -> None:

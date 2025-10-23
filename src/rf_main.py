@@ -1,8 +1,8 @@
 import argparse
-from src.collection.collect_image import collect_images
-from src.data.create_dataset import create_dataset
-from src.models.train_classifier import train_model
-from src.app.inference_classifier import run_inference
+from collection.collect_image import collect_images
+from data.create_dataset import create_dataset
+from models.train_classifier import train_model
+from app.inference_classifier import run_inference
 
 
 def main():

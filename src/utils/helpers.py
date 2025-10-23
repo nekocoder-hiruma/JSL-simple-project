@@ -27,8 +27,8 @@ def find_font_path() -> Optional[str]:
     return None
 
 
-def draw_text(frame: np.ndarray, text: str, position: tuple, font: ImageFont.FreeTypeFont,
-              color: tuple = (255, 255, 255)) -> None:
+def draw_text(frame: np.ndarray, text: str, position: tuple,
+              font: ImageFont.FreeTypeFont, color: tuple = (255, 255, 255)) -> None:
     """
     Draws text (including Japanese characters) on an OpenCV frame using PIL.
 
@@ -53,7 +53,8 @@ def draw_text(frame: np.ndarray, text: str, position: tuple, font: ImageFont.Fre
         frame[:] = cv2.cvtColor(np.array(img_pil), cv2.COLOR_RGB2BGR)
     else:
         # Fallback to OpenCV's putText if no font is found (will show '???')
-        cv2.putText(frame, "Font not found", position, cv2.FONT_HERSHEY_SIMPLEX, 1, color, 2, cv2.LINE_AA)
+        cv2.putText(frame, "Font not found", position, cv2.FONT_HERSHEY_SIMPLEX,
+                    1, color, 2, cv2.LINE_AA)
 
 
 def process_frame(frame: cv2.typing.MatLike) -> Optional[List[float]]:
@@ -64,15 +65,37 @@ def process_frame(frame: cv2.typing.MatLike) -> Optional[List[float]]:
     try:
         img_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         results = hands.process(img_rgb)
-        if results.multi_hand_landmarks:
-            hand_landmarks = results.multi_hand_landmarks[0]
-            x_coords = [lm.x for lm in hand_landmarks.landmark]
-            y_coords = [lm.y for lm in hand_landmarks.landmark]
-            base_x, base_y = min(x_coords), min(y_coords)
-            normalized_landmarks = [coord for pos in zip(x_coords, y_coords) for coord in
-                                    (pos[0] - base_x, pos[1] - base_y)]
-            return normalized_landmarks
-        return None
+
+        if not results.multi_hand_landmarks:
+            return None
+
+        hand_landmarks = results.multi_hand_landmarks[0]
+
+        # Step 1: Extract all landmark coordinates into separate lists.
+        x_coords = []
+        y_coords = []
+        for landmark in hand_landmarks.landmark:
+            x_coords.append(landmark.x)
+            y_coords.append(landmark.y)
+
+        # Step 2: Find the minimum coordinate to use as the origin for normalization.
+        # This makes the gesture data independent of its position on the screen.
+        base_x = min(x_coords)
+        base_y = min(y_coords)
+
+        # Step 3: Normalize and flatten the coordinates into a single list.
+        normalized_landmarks = []
+        for x, y in zip(x_coords, y_coords):
+            # Calculate the position relative to the hand's top-left corner.
+            normalized_x = x - base_x
+            normalized_y = y - base_y
+
+            # Append the normalized coordinates to the final list.
+            normalized_landmarks.append(normalized_x)
+            normalized_landmarks.append(normalized_y)
+
+        return normalized_landmarks
+
     except Exception as e:
         print(f"Error processing frame: {e}")
         return None

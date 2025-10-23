@@ -6,7 +6,7 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score
 from sklearn.model_selection import train_test_split
 
-from src.config_loader import DATASET_PATH, MODEL_PATH
+from config_loader import DATASET_PATH, MODEL_PATH
 
 
 def load_dataset(filepath: str) -> Optional[Tuple[np.ndarray, np.ndarray]]:

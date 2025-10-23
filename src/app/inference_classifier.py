@@ -5,7 +5,7 @@ import cv2
 import numpy as np
 from PIL import ImageFont, Image, ImageDraw
 
-from src.config_loader import (
+from config_loader import (
     hands_video, mp_drawing, mp_drawing_styles, mp_hands,
     MODEL_PATH, LABELS_DICT
 )

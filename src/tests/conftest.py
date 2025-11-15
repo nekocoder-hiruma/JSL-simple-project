@@ -46,7 +46,7 @@ def mock_hands():
 
 @pytest.fixture
 def mock_ml_libs():
-    """Mocks TensorFlow/Keras and Scikit-learn libraries for model_trainer.py."""
+    """Mocks TensorFlow/Keras and Scikit-learn libraries for keras_model_classifier.py."""
     with patch('src.models.model_trainer.to_categorical', new_callable=MagicMock) as mock_to_cat, \
             patch('src.models.model_trainer.train_test_split', new_callable=MagicMock) as mock_split, \
             patch('src.models.model_trainer.Sequential', new_callable=MagicMock) as mock_sequential:

@@ -1,6 +1,6 @@
 import argparse
 from collection.collect_sequences import collect_sequences
-from models.model_trainer import main_trainer
+from models.keras_model_classifier import main_trainer
 from app.inference import run_inference
 
 

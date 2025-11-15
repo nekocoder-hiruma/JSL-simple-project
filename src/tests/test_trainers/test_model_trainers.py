@@ -1,5 +1,5 @@
 """
-Pytest unit tests for the `model_trainer.py` module.
+Pytest unit tests for the `keras_model_classifier.py` module.
 Tests are grouped by function into separate classes.
 """
 
@@ -9,7 +9,7 @@ from unittest.mock import patch, MagicMock, mock_open
 import numpy as np
 
 # --- Import functions to be tested ---
-from src.models.model_trainer import (
+from src.models.keras_model_classifier import (
     load_dataset,
     prepare_data,
     build_lstm_model,

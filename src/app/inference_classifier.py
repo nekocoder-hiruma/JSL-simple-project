@@ -7,7 +7,7 @@ from PIL import ImageFont, Image, ImageDraw
 
 from config_loader import (
     hands_video, mp_drawing, mp_drawing_styles, mp_hands,
-    MODEL_PATH, LABELS_DICT
+    LABELS_DICT, RF_MODEL_PATH, CAMERA_INDEX
 )
 
 # --- Constants for drawing ---
@@ -45,7 +45,7 @@ def initialize_webcam() -> Optional[cv2.VideoCapture]:
     Returns:
         Optional[cv2.VideoCapture]: The VideoCapture object, or None if it fails.
     """
-    cap = cv2.VideoCapture(1)
+    cap = cv2.VideoCapture(CAMERA_INDEX)
     if not cap.isOpened():
         print("Error: Could not open video stream.")
         return None
@@ -193,7 +193,7 @@ def run_inference() -> None:
     Main orchestrator function for the inference pipeline.
     Initializes, runs the main loop, and cleans up.
     """
-    model = load_model(MODEL_PATH)
+    model = load_model(RF_MODEL_PATH)
     cap = initialize_webcam()
     font_path = find_font_path()
     font = ImageFont.truetype(font_path, 32) if font_path else None

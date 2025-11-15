@@ -1,6 +1,6 @@
 import os
 import cv2
-from src.config_loader import DATA_DIR, NUMBER_OF_CLASSES, DATASET_SIZE_PER_CLASS, LABELS_DICT
+from config_loader import DATA_DIR, NUMBER_OF_CLASSES, DATASET_SIZE_PER_CLASS, LABELS_DICT, CAMERA_INDEX
 
 
 def collect_images() -> None:
@@ -21,7 +21,7 @@ def collect_images() -> None:
         os.makedirs(DATA_DIR)
 
     # Use default camera (index 0). Change to 1 or higher if you have multiple cameras.
-    cap = cv2.VideoCapture(index=1)
+    cap = cv2.VideoCapture(index=CAMERA_INDEX)
     if not cap.isOpened():
         print("Error: Could not open video stream.")
         return

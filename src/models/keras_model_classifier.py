@@ -77,7 +77,7 @@ def train_and_save_model(model: Sequential, x_train, y_train, x_test, y_test) ->
     """
     print("\n--- Starting Model Training ---")
     # Train the model
-    model.fit(x_train, y_train, epochs=50, validation_data=(x_test, y_test))
+    model.fit(x_train, y_train, epochs=80, validation_data=(x_test, y_test))
 
     print("\n--- Training Complete. Saving model... ---")
     # Save the trained Keras model

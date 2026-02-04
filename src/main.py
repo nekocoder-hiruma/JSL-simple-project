@@ -34,25 +34,24 @@ class JSLApp:
             else: print("Invalid selection. Please try again.")
 
     def data_collection_flow(self):
-        """Guides the user through capturing static images or movement sequences."""
+        """Guides the user through capturing static poses or movement sequences."""
         print("\n--- Data Collection ---")
-        print("1. Photo Capture (for static signs)")
-        print("2. Motion Recording (for dynamic signs)")
+        print("1. Static Sign Collection ('C' to capture pose)")
+        print("2. Dynamic Sign Collection (Motion sequences)")
         
         choice = input("Select capture type: ").strip().lower()
+        handler = MediaPipeHandler(is_video_stream=True)
+        
         if choice == '1':
-            collector = StaticCollector(self.system_config, self.rm)
+            self.system_config = load_specialized_config("rf")
+            collector = StaticCollector(self.system_config, self.rm, handler)
             collector.collect()
-            if input("Process images into a dataset now? (y/n): ").lower() == 'y':
-                handler = MediaPipeHandler(is_video_stream=False)
-                creator = DatasetCreator(self.system_config, handler)
-                creator.create()
-                handler.close()
         elif choice == '2':
-            handler = MediaPipeHandler(is_video_stream=True)
+            self.system_config = load_specialized_config("keras")
             collector = DynamicCollector(self.system_config, self.rm, handler)
             collector.collect()
-            handler.close()
+        
+        handler.close()
 
     def training_flow(self):
         """Standardizes the process of teaching the models based on collected data."""

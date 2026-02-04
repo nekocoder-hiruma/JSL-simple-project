@@ -17,8 +17,8 @@ class JSLModel(ABC):
         pass
 
     @abstractmethod
-    def predict(self, data: Any) -> Any:
-        """Guesses the sign based on provided hand movement patterns."""
+    def predict(self, data: Any) -> tuple[int, float]:
+        """Guesses the sign and provides a confidence score (0.0 to 1.0)."""
         pass
 
     @abstractmethod

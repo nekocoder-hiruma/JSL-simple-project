@@ -41,15 +41,21 @@ class RFModel(JSLModel):
         score = accuracy_score(val_y, guesses)
         print(f"Success Rate: {score * 100:.2f}%")
 
-    def predict(self, pattern):
-        """Standardizes input shape and provides a prediction for the seen gesture."""
+    def predict(self, pattern) -> tuple[int, float]:
+        """Provides a prediction and a confidence score for the seen gesture."""
         if self.model is None:
             raise ValueError("Model is not ready. Please train or load it first.")
         
         sample = np.asarray(pattern)
         if sample.ndim == 1:
             sample = sample.reshape(1, -1)
-        return self.model.predict(sample)[0]
+            
+        # Get probabilities for all classes
+        probabilities = self.model.predict_proba(sample)[0]
+        prediction = int(np.argmax(probabilities))
+        confidence = float(probabilities[prediction])
+        
+        return prediction, confidence
 
     def save(self, filepath=None):
         """Preserves the trained model state to the specified location."""

@@ -75,8 +75,8 @@ class JSLApp:
     def inference_flow(self):
         """Loads a trained model and starts the real-time recognition interface."""
         print("\n--- Gesture Recognition ---")
-        print("1. Recognize Static Signs")
-        print("2. Recognize Dynamic Signs")
+        print("1. Random Forest(CNN)")
+        print("2. LSTM using Sequential")
         
         choice = input("Select mode: ").strip().lower()
         if choice == '1':

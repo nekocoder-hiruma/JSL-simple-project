@@ -46,9 +46,9 @@ def run_inference():
         # Detect hand and extract position data
         points = handler.process_frame(frame)
         if points:
-            # Get the model's guess
-            result_idx = model.predict(points)
-            sign_name = labels_dict.get(int(result_idx), "Unknown")
+            # Get the model's guess and confidence level
+            result_idx, confidence = model.predict(points)
+            sign_name = f"Predicted character: {labels_dict.get(int(result_idx), 'Unknown')} ({confidence*100:.1f}%)"
             
             # Display results to the user
             draw_visual_feedback(frame, sign_name, (50, 50), font)

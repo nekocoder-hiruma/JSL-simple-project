@@ -51,8 +51,8 @@ class LSTMModel(JSLModel):
         print("\n--- Model Training in Progress ---")
         self.model.fit(train_x, train_y, epochs=80, validation_data=(val_x, val_y))
 
-    def predict(self, motion_sequence) -> int:
-        """Analyzes a full movement pattern and identifies the most likely sign."""
+    def predict(self, motion_sequence) -> tuple[int, float]:
+        """Analyzes movement and returns the most likely sign with a confidence score."""
         if self.model is None:
             raise ValueError("Model is not ready. Please train or load it first.")
         
@@ -61,8 +61,12 @@ class LSTMModel(JSLModel):
         if sample.ndim == 2:
             sample = np.expand_dims(sample, axis=0)
             
-        predictions = self.model.predict(sample)
-        return int(np.argmax(predictions))
+        # Get raw probabilities from the softmax output
+        predictions = self.model.predict(sample)[0]
+        class_idx = int(np.argmax(predictions))
+        confidence = float(predictions[class_idx])
+        
+        return class_idx, confidence
 
     def save(self, filepath=None):
         """Saves the model's internal structure and weights to a file."""

@@ -53,8 +53,8 @@ def run_inference():
 
         # Once the buffer is full, attempt a prediction
         if len(buffer) == seq_len:
-            result_idx = model.predict(list(buffer))
-            sign_name = labels_dict.get(result_idx, "Unknown")
+            result_idx, confidence = model.predict(list(buffer))
+            sign_name = f"Predicted character: {labels_dict.get(result_idx, 'Unknown')} ({confidence*100:.1f}%)"
             
             # Label the video stream with the detected sign
             draw_visual_feedback(frame, sign_name, (50, 50), font)

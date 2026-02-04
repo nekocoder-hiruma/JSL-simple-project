@@ -1,129 +1,83 @@
 # Real-Time Japanese Sign Language (JSL) Gesture Recognizer
 
-This project is a real-time hand gesture recognition system built to classify the first 20 characters of the Japanese hiragana syllabary using a standard webcam in the first iteration. It leverages computer vision and machine learning to create a flexible and robust pipeline for data collection, model training, and inference.
-
-The project has evolved to a LSM to recognise motion based gesture and optimization development is still in progress.
-
-This project was inspired by a tutorial from the [Computer Vision Engineer YouTube channel](https://www.youtube.com/watch?v=MJCSjXepaAM) and has been significantly evolved to support dynamic gestures and a more professional development workflow.
-
+This project is a real-time hand gesture recognition system built to study ML models for Japanese sign language recognition. It supports both static signs (individual positions) and dynamic gestures (motions over time) using MediaPipe for landmark extraction.
+This project was inspired by a tutorial from the [Computer Vision Engineer YouTube channel](https://www.youtube.com/watch?v=MJCSjXepaAM).
 
 ## Features
 
-* **Dynamic Gesture Recognition**: Utilizes an LSTM deep learning model to understand signs that involve motion over time.
-* **Centralized Configuration**: All settings are managed in a simple `config.ini` file, allowing for easy changes without touching the code.
-* **Advanced Data Collection**: A highly user-friendly and flexible data collection script that supports:
-    * **Continuous Collection Mode**: Automatically captures all samples for a sign after a single prompt.
-    * **Resumable Sessions**: Stop at any point, and the script saves your progress. Start again, and it appends to your existing dataset.
-    * **Start From Any Character**: Configure which sign you want to start collecting from.
-    * **Review and Discard**: Immediately review and discard any sample you're not happy with.
-* **Modular and Maintainable Code**: Shared logic is centralized in a `helpers.py` file, following the DRY (Don't Repeat Yourself) principle.
-
-## Configuration
-
-Before running the project, you can adjust settings in the **`config.ini`** file. This is where you can set the camera you want to use, change file paths, or modify model parameters.
-
-**Key Settings to Note:**
-
-* `camera/index`: Set this to `0` for your built-in webcam, or `1`, `2`, etc., for external cameras.
-* `data_collection/start_class_index`: Set this to the character index you want to start collecting from (e.g., `15` for 'た'). The script will resume from this point.
+*   **Interactive Interface**: A unified entry point guides you through data collection, training, and inference via easy-to-follow prompts.
+*   **Static & Dynamic Recognition**:
+    *   **Random Forest**: Fast and accurate for static signs (single photos).
+    *   **LSTM (RNN)**: Analyzes sequences of motion for dynamic signs.
+*   **Modular Architecture**: Clean separation between core logic, data processing, and model implementations.
+*   **Centralized Resource Management**: Efficient handling of webcam and font resources to avoid duplication.
+*   **Tiered Configuration**: Load base project settings and override them with model-specific configurations.
 
 ## Setup and Installation
 
 ### Prerequisites
 
-* Python 3.12+
-* [uv](https://github.com/astral-sh/uv) installed (`pip install uv`).
-* A webcam connected to your computer.
+*   Python 3.12+
+*   [uv](https://github.com/astral-sh/uv) installed (`pip install uv`).
+*   A webcam connected to your computer.
 
-### 1. Set Up the Environment with `uv`
+### 1. Set Up the Environment
 
-This project uses `uv`, a fast Python package installer and resolver.
+This project uses `uv` for lightning-fast dependency management.
 
 ```bash
 # Create and activate a virtual environment
 uv venv
 
-# Activate the environment
+# Activate the environment (macOS/Linux)
+source .venv/bin/activate
 # On Windows:
 .venv\Scripts\activate
-# On macOS/Linux:
-source .venv/bin/activate
-```
 
-### 2. Install Dependencies
-
-Install all the required Python libraries from the uv lock file:
-
-```bash
+# Install dependencies
 uv sync
 ```
+
 ## How to Run the Project
 
-The project workflow is divided into three main scripts. You must run them in the following order.
-
-### Step 1: Collect Sequence Data
-
-This script launches an advanced data collection interface. It will automatically load any existing `data.pickle` file and allow you to add to it.
-
-1.  **Configure `config.ini`:** Open `config.ini` and set `start_class_index` to the character you wish to start from.
-2.  **Run the collection script:**
-    ```bash
-    python main.py collect
-    ```
-3.  A window will appear, prompting you to press **'S'** to begin collecting all samples for the starting character.
-4.  The script will then automatically record each sample, with a countdown timer in between to allow you to reset.
-5.  After each recording, you have a moment to press **'D'** to discard and re-record the last sample.
-6.  Once all samples for a character are done, you will be prompted for the next one. You can press **'Q'** at this screen to quit and save all your progress.
-
-### Step 2: Train the Model
-
-This script loads the `data.pickle` file, trains the LSTM model, and saves the trained model as `jsl_model.h5`.
+Everything is controlled via a single interactive script:
 
 ```bash
-python main.py train
+python src/main.py
 ```
-### Step 3: Run Real-Time Inference
 
-You're all set! This final step runs the real-time gesture recognition.
+### Workflow
 
-1.  Run the inference script:
-    ```bash
-    python main.py inference
-    ```
-## Legacy Version (RandomForest Model)
+1.  **Gather Training Data**:
+    *   Choose **Photo Capture** for static signs or **Motion Recording** for dynamic sequences.
+    *   Follow the on-screen prompts (e.g., Press 'S' to start) to capture data for each category.
+2.  **Train Decision Models**:
+    *   Select the model type (**Random Forest** for static or **LSTM** for dynamic).
+    *   The model will learn from your collected data and save its progress in `src/saved_models/`.
+3.  **Run Live Gesture Recognition**:
+    *   Select your desired recognition mode.
+    *   The webcam will open, providing real-time feedback and labeling the detected signs on your screen.
 
-The original version of this project, which uses a `RandomForestClassifier` for **static** gesture recognition, is available in the `original_randomforest` directory. This version is faster and may have higher accuracy for static poses but does not support dynamic gestures.
+## Configuration
+
+Settings are managed in the `src/configs/` directory:
+*   `base_config.ini`: General project paths and camera settings.
+*   `rf_config.ini`: Specific parameters for the Random Forest model.
+*   `keras_config.ini`: Specific parameters for the LSTM model.
 
 ## File Structure
 
-The project is organized into a src package to ensure modularity and scalability. All operations are run from within this directory.
-```aiignore
-JSL-simple-project/
-└── src/
-    ├── app/
-    │   └── inference.py
-    ├── collection/
-    │   └── collect_sequences.py
-    ├── configs/
-    │   └── config.ini
-    ├── data/
-    │   └── (functions to create dataset for model training)
-    ├── dataset/
-    │   └── (raw collected data and processed data appears here)
-    ├── labels/
-    │   └── labels.csv
-    ├── models/
-    │   └── model_trainer.py
-    ├── saved_models/
-    │   ├── jsl_model.keras
-    │   └── model.p
-    ├── tests/
-    │   └── ...
-    ├── utils/
-    │   └── helpers.py
-    ├── __init__.py
-    ├── config_loader.py
-    ├── main.py
-    └── rf_main.py
+The project follows a modular refined structure within the `src` package:
 
+```text
+src/
+├── core/               # Configuration, Resource management, and MediaPipe logic
+├── data/               # Collection scripts (Static/Dynamic) and Processing utilities
+├── models/             # Self-contained model implementations (Base, RF, LSTM)
+├── app/                # Real-time inference applications
+├── utils/              # Shared helper functions for visual feedback
+├── configs/            # Config files (.ini)
+├── saved_models/       # Directory for trained model artifacts
+├── labels/             # Mapping of category indices to Japanese characters
+└── main.py             # Interactive project controller
 ```
